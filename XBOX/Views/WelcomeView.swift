@@ -13,24 +13,69 @@ struct WelcomeView: View {
     @State private var offsetController = CGSize.zero
     @State private var offsetPerson = CGSize.zero
     @State private var offsetBag = CGSize.zero
- 
+    @State private var welcomeText = "WELCOME \nTO THE \nALL NEW \nXBOX \nEXPERIENCE"
+    @State private var nextWelcomeText = "CONTROL \nYOUR \nXBOX \nWITH THE \nAPP"
+    @State private var textOpacity: Double = 1
+    @State private var showChevron = true
+    @State private var isDragging = false
+    @State private var animating = false
+    @State private var dragProgress: CGFloat = 0.0
+    
+    private let maxDrag: CGFloat = 100.0 // max drag distance
+    private let lineHeight: CGFloat = 44.0
+    
+    private var welcomeLines: [String] {
+        welcomeText.components(separatedBy: "\n")
+    }
+    
+    private var nextWelcomeLines: [String] {
+        nextWelcomeText.components(separatedBy: "\n")
+    }
+    
+    private var maxLines: Int {
+        max(welcomeLines.count, nextWelcomeLines.count)
+    }
+    
     var body: some View {
         ZStack {
             Color("backgroundColor").edgesIgnoringSafeArea(.all)
             Image("xboxLogo")
                 .fixedSize()
                 .scaleEffect(showOnboarding ? 0.0 : 1)
-//                .scaleEffect(0)
                 .animation(.easeOut(duration: 0.3))
             VStack(alignment: .leading, spacing: 0) {
                 Spacer()
                 
                 HStack {
-                    Text("WELCOME \nTO THE \nALL NEW \nXBOX \nEXPERIENCE")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize()
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(0..<maxLines, id: \.self) { i in
+                            let lineProgress = min(max((dragProgress * CGFloat(maxLines)) - CGFloat(i), 0), 1)
+                            ZStack(alignment: .leading) {
+                                // Old line animating out
+                                if i < welcomeLines.count {
+                                    Text(welcomeLines[i])
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                        .fixedSize()
+                                        .offset(y: lineProgress * lineHeight)
+                                        .opacity(Double(1 - lineProgress))
+                                        .animation(.none, value: dragProgress)
+                                }
+                                // New line animating in
+                                if i < nextWelcomeLines.count {
+                                    Text(nextWelcomeLines[i])
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                        .fixedSize()
+                                        .offset(y: (1 - lineProgress) * -lineHeight)
+                                        .opacity(Double(lineProgress))
+                                        .animation(.none, value: dragProgress)
+                                }
+                            }
+                            .frame(height: lineHeight, alignment: .top)
+                            .clipped()
+                        }
+                    }
                     Spacer()
                 }
                 .padding(.bottom, 56)
@@ -39,29 +84,39 @@ struct WelcomeView: View {
                     .frame(width: 256)
                     .padding(.bottom, 56)
                 
-                HStack(alignment: .center, spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.black)
-                            .frame(width: 64, height: 64)
-                        Image(systemName: "gamecontroller")
-                            .font(.system(size: 24, weight: .bold))
-                            .frame(width: 64, height: 64)
-                            .background(VisualEffectView(material: .systemUltraThinMaterial))
-                            .clipShape(Circle())
-                            .offset(y: offsetController.height)
-                            .animation(.easeOut(duration: 0.3))
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { gesture in
-                                        if gesture.translation.height > 0 && gesture.translation.height <= 100 {
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.black)
+                                .frame(width: 64, height: 64)
+                            Image(systemName: "gamecontroller")
+                                .font(.system(size: 24, weight: .bold))
+                                .frame(width: 64, height: 64)
+                                .background(VisualEffectView(material: .systemUltraThinMaterial))
+                                .clipShape(Circle())
+                                .offset(y: offsetController.height)
+                                .animation(.easeOut(duration: 0.3))
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { gesture in
+                                            let progress = min(max(gesture.translation.height / maxDrag, 0), 1)
                                             self.offsetController = gesture.translation
+                                            self.showChevron = false
+                                            self.dragProgress = progress
                                         }
-                                }
-                                .onEnded { _ in
-                                    self.offsetController = CGSize.zero
-                                }
-                        )
+                                        .onEnded { _ in
+                                            self.offsetController = CGSize.zero
+                                            self.showChevron = true
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                self.dragProgress = 0
+                                            }
+                                        }
+                                )
+                        }
+                        ChevronAnimator()
+                            .opacity(showChevron ? 1 : 0)
+                            .animation(.easeInOut(duration: 0.3), value: showChevron)
                     }
                         
                     ZStack {
@@ -81,11 +136,11 @@ struct WelcomeView: View {
                                         if gesture.translation.height > 0 && gesture.translation.height <= 100 {
                                             self.offsetPerson = gesture.translation
                                         }
-                                }
-                                .onEnded { _ in
-                                    self.offsetPerson = CGSize.zero
-                                }
-                        )
+                                    }
+                                    .onEnded { _ in
+                                        self.offsetPerson = CGSize.zero
+                                    }
+                            )
                     }
                     
                     ZStack {
@@ -106,11 +161,11 @@ struct WelcomeView: View {
                                             if gesture.translation.height > 0 && gesture.translation.height <= 100 {
                                                 self.offsetBag = gesture.translation
                                             }
-                                    }
-                                    .onEnded { _ in
-                                        self.offsetBag = CGSize.zero
-                                    }
-                        )
+                                        }
+                                        .onEnded { _ in
+                                            self.offsetBag = CGSize.zero
+                                        }
+                                )
                     }
                 }
                 .padding(.bottom, 128)
@@ -138,6 +193,8 @@ struct WelcomeView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {

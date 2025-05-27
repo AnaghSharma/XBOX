@@ -16,6 +16,7 @@
 		A72A56752463410F00949293 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A72A56742463410F00949293 /* Colors.xcassets */; };
 		A76EE3B0247DA40500E16A39 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76EE3AF247DA40500E16A39 /* VisualEffectView.swift */; };
 		A76EE3B3247DA87800E16A39 /* FullWidthButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76EE3B2247DA87800E16A39 /* FullWidthButtonStyle.swift */; };
+		D411A3A72DE47624003EE457 /* ChevronAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D411A3A62DE47624003EE457 /* ChevronAnimator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		A72A56742463410F00949293 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		A76EE3AF247DA40500E16A39 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		A76EE3B2247DA87800E16A39 /* FullWidthButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthButtonStyle.swift; sourceTree = "<group>"; };
+		D411A3A62DE47624003EE457 /* ChevronAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChevronAnimator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 		A76EE3AE247DA3EC00E16A39 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				D411A3A62DE47624003EE457 /* ChevronAnimator.swift */,
 				A76EE3AF247DA40500E16A39 /* VisualEffectView.swift */,
 			);
 			path = Controls;
@@ -200,6 +203,7 @@
 				A76EE3B0247DA40500E16A39 /* VisualEffectView.swift in Sources */,
 				A72A5660246336AB00949293 /* SceneDelegate.swift in Sources */,
 				A76EE3B3247DA87800E16A39 /* FullWidthButtonStyle.swift in Sources */,
+				D411A3A72DE47624003EE457 /* ChevronAnimator.swift in Sources */,
 				A72A5662246336AB00949293 /* WelcomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
