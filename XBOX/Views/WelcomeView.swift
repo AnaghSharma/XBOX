@@ -83,7 +83,9 @@ func highlightedText(line: String, keyword: String) -> some View {
 }
 
 struct WelcomeView: View {
-    @State private var showOnboarding = true
+    @State private var showOnboarding = false
+    @State private var showMainContent = false
+    @State private var mainContentOpacity: Double = 0
     @State private var welcomeText = "WELCOME \nTO THE \nALL NEW \nXBOX \nEXPERIENCE"
     @State private var textOpacity: Double = 1
     @State private var showChevron = true
@@ -125,8 +127,9 @@ struct WelcomeView: View {
             Color("backgroundColor").edgesIgnoringSafeArea(.all)
             Image("xboxLogo")
                 .fixedSize()
-                .scaleEffect(showOnboarding ? 0.0 : 1)
-                .animation(.easeOut(duration: 0.3))
+                .scaleEffect(showOnboarding ? 24.0 : 1)
+                .opacity(showOnboarding ? 0 : 1)
+                .animation(.easeInOut(duration: 0.5), value: showOnboarding)
             VStack(spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     Spacer()
@@ -238,10 +241,24 @@ struct WelcomeView: View {
                 .padding(.bottom, 4)
             }
             .padding(.horizontal, 16)
+            .opacity(mainContentOpacity)
+            .animation(.easeInOut(duration: 0.5), value: mainContentOpacity)
         }
         .onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                self.showOnboarding = true
+            // Initial delay before the logo animation starts
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                // Start the logo scale up and fade out animation
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    self.showOnboarding = true
+                }
+
+                // Start the main content fade-in animation after the logo animation finishes
+                // The delay here is relative to when the outer asyncAfter block executes
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                     withAnimation(.easeInOut(duration: 0.5)) {
+                        self.mainContentOpacity = 1
+                     }
+                }
             }
         }
     }
